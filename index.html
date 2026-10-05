@@ -499,13 +499,14 @@ const firebaseConfig = {
 };
 
 let FB=null,USE_CLOUD=false;
-if(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId){
+if(firebaseConfig.apiKey&&firebaseConfig.projectId){
   try{
     const[appM,authM,fsM]=await Promise.all([
       import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"),
       import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")]);
-    const app=appM.initializeApp(FIREBASE_CONFIG);
+const app=appM.initializeApp(firebaseConfig);
+    
     FB={auth:authM.getAuth(app),db:fsM.getFirestore(app),A:authM,F:fsM};USE_CLOUD=true;
   }catch(e){console.warn("Firebase offline",e)}
 }
