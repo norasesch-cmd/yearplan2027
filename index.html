@@ -489,7 +489,14 @@ body.present .docbar{position:fixed;bottom:18px;left:50%;transform:translateX(-5
 
 <script type="module">
 /* ============ ใส่ค่า Firebase ตรงนี้ (เว้นว่าง = ออฟไลน์) ============ */
-const FIREBASE_CONFIG={apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""};
+const firebaseConfig = {
+  apiKey: "AIzaSyBiY2ygQgGItqnrmhI77xXjz_Npv_CmNnE",
+  authDomain: "yearplan2027.firebaseapp.com",
+  projectId: "yearplan2027",
+  storageBucket: "yearplan2027.firebasestorage.app",
+  messagingSenderId: "1023223369871",
+  appId: "1:1023223369871:web:97f63a70b695c50d32e0fa"
+};
 
 let FB=null,USE_CLOUD=false;
 if(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId){
