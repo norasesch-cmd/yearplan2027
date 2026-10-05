@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ระบบจัดทำแผนการดำเนินงาน (ผด.๐๒) – เทศบาลเมืองดอนแก้ว</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ INSIGHTDECK TOKENS ============ */
+:root{
+  --pri:#0D9488; --pri-d:#0B7A70; --pri-l:#14B8A6; --pri-bg:#F0FDFA;
+  --sec:#9333EA; --sec-l:#A855F7; --sec-bg:#FAF5FF;
+  --ter:#EC4899; --ter-l:#F472B6; --ter-bg:#FDF2F8;
+  --bg:#F8FAFC; --surf:#FFFFFF;
+  --ok:#10B981; --warn:#F59E0B; --err:#EF4444; --info:#3B82F6;
+  --ink:#0F172A; --ink2:#334155; --mute:#64748B; --line:#E2E8F0; --line2:#F1F5F9;
+  --r:8px; --r-lg:12px; --r-xl:16px;
+  --sh:0 1px 2px rgba(15,23,42,.06);
+  --sh-md:0 2px 8px rgba(15,23,42,.08);
+  --sh-lg:0 8px 24px rgba(15,23,42,.10);
+  --sh-xl:0 16px 48px rgba(15,23,42,.14);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Sarabun',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+
+header{background:var(--surf);border-bottom:1px solid var(--line);padding:0 24px;
+  display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;height:64px}
+.brand{display:flex;align-items:center;gap:12px}
+.blogo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--pri),var(--sec));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;flex:none}
+header h1{margin:0;font-size:15.5px;font-weight:700;letter-spacing:-.2px}
+header p{margin:1px 0 0;font-size:11.5px;color:var(--mute)}
+.who{display:flex;align-items:center;gap:10px;font-size:12px}
+.who b{display:block;font-size:13px;font-weight:600}
+.who span{color:var(--mute);font-size:11.5px}
+.cloud{font-size:11px;padding:4px 10px;border-radius:99px;background:var(--pri-bg);color:var(--pri-d);
+  font-weight:600;border:1px solid #CCFBF1}
+
+nav{background:var(--surf);border-bottom:1px solid var(--line);padding:0 24px;display:flex;gap:2px;
+  flex-wrap:wrap;position:sticky;top:0;z-index:20}
+nav button{background:none;border:none;padding:12px 16px;font-family:inherit;font-size:13.5px;
+  cursor:pointer;border-bottom:2px solid transparent;color:var(--mute);font-weight:600;transition:all .15s}
+nav button:hover{color:var(--ink);background:var(--line2)}
+nav button.on{color:var(--pri);border-color:var(--pri)}
+nav button[hidden]{display:none}
+main{max-width:1320px;margin:20px auto;padding:0 24px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:940px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surf);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;
+  position:relative;overflow:hidden;transition:box-shadow .2s}
+.stat:hover{box-shadow:var(--sh-md)}
+.stat::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--c,var(--pri))}
+.stat .lbl{font-size:11.5px;color:var(--mute);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.stat .val{font-size:26px;font-weight:700;margin:5px 0 2px;letter-spacing:-.8px;color:var(--ink)}
+.stat .sub{font-size:11.5px;color:var(--mute)}
+.stat .ico{position:absolute;right:14px;top:14px;width:34px;height:34px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--cbg,var(--pri-bg))}
+
+.chart{display:flex;align-items:flex-end;gap:8px;height:170px;padding:16px 4px 0;border-bottom:1px solid var(--line)}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.bar .col{width:100%;max-width:48px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--pri-l),var(--pri));
+  transition:height .5s cubic-bezier(.4,0,.2,1);position:relative;min-height:3px}
+.bar .col.q2{background:linear-gradient(180deg,var(--sec-l),var(--sec))}
+.bar .col:hover{filter:brightness(1.1)}
+.bar .col::after{content:attr(data-v);position:absolute;top:-19px;left:50%;transform:translateX(-50%);
+  font-size:10.5px;font-weight:700;color:var(--ink2);white-space:nowrap}
+.bar .cap{font-size:10.5px;color:var(--mute);text-align:center;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;width:100%;font-weight:500}
+
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;margin-bottom:16px}
+.card h3{margin:0 0 3px;font-size:15px;font-weight:700;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+.card .desc{margin:0 0 16px;font-size:12px;color:var(--mute)}
+.card h3 .ico{width:26px;height:26px;border-radius:7px;background:var(--pri-bg);color:var(--pri);
+  display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.card.sec h3 .ico{background:var(--sec-bg);color:var(--sec)}
+.card.ter h3 .ico{background:var(--ter-bg);color:var(--ter)}
+.cardhd{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.cardhd h3{margin-bottom:3px}
+.yrpick{display:flex;align-items:center;gap:8px;flex:none}
+.yrpick label{margin:0;font-size:11.5px;white-space:nowrap}
+.yrpick select{min-width:160px;padding:7px 10px;font-size:13px}
+.grid{display:grid;gap:13px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+label{display:block;font-size:12px;color:var(--ink2);margin-bottom:5px;font-weight:600}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:var(--r);
+  font-family:inherit;font-size:13.5px;background:var(--surf);color:var(--ink);transition:all .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(13,148,136,.12)}
+input[readonly],input.ro{background:var(--line2);color:var(--ink2);font-weight:600}
+textarea{resize:vertical}
+
+.btn{border:1px solid transparent;border-radius:var(--r);padding:9px 18px;font-family:inherit;font-size:13.5px;
+  font-weight:600;cursor:pointer;transition:all .15s;background:var(--pri);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;box-shadow:var(--sh)}
+.btn:hover{background:var(--pri-d);box-shadow:var(--sh-md)}
+.btn:active{transform:translateY(1px)}
+.btn.gh{background:var(--surf);color:var(--ink2);border-color:var(--line)}
+.btn.gh:hover{background:var(--line2);border-color:#CBD5E1}
+.btn.sec{background:var(--sec)}.btn.sec:hover{background:#7E22CE}
+.btn.ter{background:var(--ter)}.btn.ter:hover{background:#DB2777}
+.btn.dg{background:var(--err)}.btn.dg:hover{background:#DC2626}
+.btn.ok{background:var(--ok)}.btn.ok:hover{background:#059669}
+.btn.sm{padding:5px 12px;font-size:12px;min-height:30px}
+
+.item{background:var(--surf);border:1px solid var(--line);border-radius:var(--r-lg);margin-bottom:16px;overflow:hidden}
+.item>.hd{background:var(--line2);padding:11px 16px;display:flex;justify-content:space-between;
+  align-items:center;font-weight:700;font-size:13.5px;border-bottom:1px solid var(--line)}
+.item>.bd{padding:16px;display:grid;gap:14px}
+.side{border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.side.inf{background:var(--pri-bg);border-color:#CCFBF1}
+.side.tim{background:var(--sec-bg);border-color:#E9D5FF}
+.side h4{margin:0 0 12px;font-size:12.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+  display:flex;align-items:center;gap:6px}
+.side.inf h4{color:var(--pri-d)}.side.tim h4{color:var(--sec)}
+
+.mgrid{display:grid;grid-template-columns:repeat(12,1fr);gap:6px}
+@media(max-width:860px){.mgrid{grid-template-columns:repeat(6,1fr)}}
+.mchk{border:1px solid var(--line);border-radius:7px;background:var(--surf);padding:7px 2px;text-align:center;
+  cursor:pointer;font-size:11.5px;font-weight:600;color:var(--ink2);user-select:none;transition:all .15s}
+.mchk:hover{border-color:var(--sec-l)}
+.mchk input{display:none}
+.mchk.on{background:var(--sec);color:#fff;border-color:var(--sec)}
+.mchk .yr{display:block;font-size:9.5px;opacity:.65;font-weight:500}
+.qrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+
+table.list{width:100%;border-collapse:collapse;font-size:13px}
+table.list th{background:var(--line2);color:var(--ink2);padding:10px 11px;text-align:left;
+  font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--line)}
+table.list td{padding:11px;border-bottom:1px solid var(--line2);vertical-align:middle}
+table.list tr:hover td{background:#FCFDFE}
+table.list td input,table.list td select{padding:6px 9px;font-size:12.5px}
+table.list .mini{display:inline-flex;gap:2px}
+table.list .mini i{width:9px;height:9px;border-radius:2px;background:var(--line);display:block}
+table.list .mini i.on{background:var(--sec)}
+
+.badge{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;display:inline-block;white-space:nowrap;border:1px solid}
+.b-wait{background:#FFFBEB;color:#B45309;border-color:#FDE68A}
+.b-ok{background:#ECFDF5;color:#047857;border-color:#A7F3D0}
+.b-no{background:#FEF2F2;color:#B91C1C;border-color:#FECACA}
+.b-draft{background:var(--line2);color:var(--mute);border-color:var(--line)}
+.chip{padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;background:var(--sec-bg);color:var(--sec);border:1px solid #E9D5FF}
+.chip.t{background:var(--ter-bg);color:var(--ter);border-color:#FBCFE8}
+.av{width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:12px;flex:none}
+.owner{display:flex;align-items:center;gap:8px}
+.right{text-align:right}.center{text-align:center}
+.tot{background:linear-gradient(135deg,var(--pri),var(--sec));padding:14px 18px;border-radius:var(--r-lg);
+  font-weight:600;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tot .n{font-size:22px;font-weight:700;letter-spacing:-.5px}
+.sumbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.sumpill{background:var(--line2);border:1px solid var(--line);border-radius:var(--r);padding:8px 14px;font-size:12.5px}
+.sumpill b{font-size:15px;display:block;margin-top:1px;letter-spacing:-.3px}
+.warn{background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;padding:11px 14px;
+  border-radius:var(--r);margin-top:10px;font-size:12.5px;font-weight:500}
+.hint{font-size:11.5px;color:var(--mute);font-weight:400}
+.modebox{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:var(--r);
+  padding:11px 14px;font-size:12.5px;color:#1D4ED8;margin-top:9px}
+.rpt{width:100%;border-collapse:collapse;font-size:13px}
+.rpt th{background:var(--line2);padding:9px 10px;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;
+  color:var(--ink2);border-bottom:1px solid var(--line);text-align:right}
+.rpt th:first-child{text-align:left}
+.rpt td{padding:9px 10px;border-bottom:1px solid var(--line2);text-align:right}
+.rpt td:first-child{text-align:left;font-weight:600}
+.rpt tr:hover td{background:#FCFDFE}
+.rpt tfoot td{background:var(--pri-bg);font-weight:700;border-top:2px solid var(--pri);color:var(--pri-d)}
+.rpt .mb{height:7px;background:var(--line2);border-radius:99px;overflow:hidden;min-width:70px}
+.rpt .mb i{display:block;height:100%;background:var(--sec);border-radius:99px}
+
+#gate{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:linear-gradient(135deg,#0D9488 0%,#0F766E 40%,#7E22CE 100%);overflow:auto}
+#gate::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 18% 22%,rgba(236,72,153,.28),transparent 42%),
+             radial-gradient(circle at 82% 78%,rgba(20,184,166,.32),transparent 45%)}
+.gwrap{position:relative;z-index:2;width:100%;max-width:400px}
+.glogo{text-align:center;margin-bottom:22px;color:#fff}
+.glogo .ic{width:56px;height:56px;border-radius:15px;background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.28);display:inline-flex;align-items:center;justify-content:center;
+  font-size:26px;margin-bottom:12px;backdrop-filter:blur(10px)}
+.glogo h1{margin:0;font-size:19px;font-weight:700;letter-spacing:-.3px}
+.glogo p{margin:5px 0 0;font-size:12.5px;opacity:.85}
+.gbox{background:var(--surf);border-radius:var(--r-xl);padding:26px;box-shadow:var(--sh-xl)}
+.gbox .row{margin-bottom:13px}
+.gtab{display:flex;gap:4px;margin-bottom:20px;background:var(--line2);padding:4px;border-radius:var(--r)}
+.gtab button{flex:1;padding:8px;border:none;background:none;border-radius:6px;font-family:inherit;
+  font-size:13px;cursor:pointer;color:var(--mute);font-weight:600;transition:all .15s}
+.gtab button.on{background:var(--surf);color:var(--pri);box-shadow:var(--sh)}
+.gerr{background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;padding:10px 12px;
+  border-radius:var(--r);font-size:12.5px;margin-bottom:13px;display:none}
+.gpreview{width:64px;height:64px;object-fit:contain;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--line2);padding:6px}
+
+#doc{background:#E7EBF0;padding:24px 0}
+.docbar{max-width:1320px;margin:14px auto;display:flex;gap:9px;flex-wrap:wrap;padding:0 24px;align-items:center}
+.sheet{background:#fff;margin:0 auto 20px;box-shadow:var(--sh-xl);color:#000;
+  font-family:'TH SarabunIT๙','TH SarabunIT9','TH SarabunPSK','Sarabun',sans-serif;line-height:1.3}
+.sheet.ls{width:29.7cm;min-height:21cm;padding:1.1cm 1.3cm;font-size:15pt}
+.sheet.pt{width:21cm;min-height:29.7cm;padding:1.5cm 2cm;font-size:16pt}
+.dhead{text-align:center;font-weight:700;line-height:1.25}
+.dhead .f{font-size:18pt}
+.dform{text-align:right;font-weight:700;font-size:16pt;margin-bottom:-26px}
+.dstars{letter-spacing:2px}
+.dgroup{font-weight:700;font-size:15pt;margin:9px 0 3px}
+.dgroup2{font-weight:700;font-size:15pt;margin:2px 0 4px;padding-left:1cm}
+table.doc{width:100%;border-collapse:collapse;font-size:13.5pt;table-layout:fixed}
+table.doc th,table.doc td{border:1px solid #000;padding:3px 4px;vertical-align:top;word-wrap:break-word}
+table.doc th{text-align:center;font-weight:700;vertical-align:middle;background:#F4F6F8}
+table.doc td.c{text-align:center}table.doc td.r{text-align:right}
+table.doc td.mc{padding:4px 1px;vertical-align:middle}
+.vt{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;font-size:12pt;white-space:nowrap}
+table.arw{width:100%;border-collapse:collapse}
+table.arw td{border:none;padding:0;font-size:11pt;line-height:1;text-align:center}
+table.arw td.m{border:none;border-top:1.3px solid #000;width:99%}
+.dsum{margin-top:6px;font-weight:700;font-size:15pt;text-align:right}
+.dfoot{margin-top:10px;font-size:13pt;text-align:right;color:#333}
+.sig{margin-top:26px;text-align:center;width:45%;float:right;font-size:16pt;line-height:1.3}
+.clr{clear:both}
+.ph{display:inline-block;border:1px dashed #F0A030;background:#FFFBF2;border-radius:4px;
+  padding:0 8px;color:#B8792B;font-size:13pt}
+body.present header,body.present nav,body.present .docbar .hidepres{display:none!important}
+body.present #doc{background:#1E293B;padding:20px 0;min-height:100vh}
+body.present .sheet{box-shadow:0 20px 60px rgba(0,0,0,.5)}
+body.present .docbar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:80;
+  background:rgba(15,23,42,.92);padding:9px 14px;border-radius:99px;margin:0;width:auto;
+  backdrop-filter:blur(12px);box-shadow:var(--sh-lg)}
+@media print{
+  body{background:#fff}
+  .noprint,#errbox,header,nav,.docbar{display:none!important}
+  main{max-width:none;padding:0;margin:0}
+  #doc{background:#fff;padding:0}
+  .sheet{width:auto;min-height:auto;margin:0;padding:0;box-shadow:none;page-break-after:always}
+  @page{size:A4 landscape;margin:1cm}
+}
+.tabpane{display:none}.tabpane.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#errbox{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:var(--err);color:#fff;
+  padding:11px 16px;font-size:13px;white-space:pre-wrap;box-shadow:var(--sh-lg)}
+#errbox b{display:block;margin-bottom:2px;font-weight:700}
+.empty{padding:44px 20px;text-align:center;color:var(--mute)}
+.empty .e{font-size:34px;margin-bottom:8px;opacity:.4}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="gate">
+ <div class="gwrap">
+  <div class="glogo">
+    <div class="ic">🗂</div>
+    <h1>ระบบจัดทำแผนการดำเนินงาน (ผด.๐๒)</h1>
+    <p>เทศบาลเมืองดอนแก้ว อำเภอแม่ริม จังหวัดเชียงใหม่</p>
+  </div>
+  <div class="gbox">
+    <div class="gtab">
+      <button type="button" id="tabSignin" class="on" data-gt="in">เข้าสู่ระบบ</button>
+      <button type="button" id="tabSignup" data-gt="up">สมัครสมาชิก</button>
+    </div>
+    <div class="gerr" id="gerr"></div>
+    <div class="row" id="rowName" style="display:none"><label>ชื่อ-นามสกุล</label><input id="g_name" placeholder="เช่น นายนรเศรษฐ ชุ่มถนอม"></div>
+    <div class="row" id="rowDept" style="display:none"><label>ส่วนราชการ (กอง/สำนัก)</label><input id="g_dept" placeholder="เช่น สำนักปลัดเทศบาล"></div>
+    <div class="row"><label>อีเมล</label><input type="email" id="g_email" autocomplete="username"></div>
+    <div class="row"><label>รหัสผ่าน</label><input type="password" id="g_pw" autocomplete="current-password" placeholder="อย่างน้อย 6 ตัวอักษร"></div>
+    <div style="height:7px"></div>
+    <button type="button" class="btn" style="width:100%" id="gBtn">เข้าสู่ระบบ</button>
+    <p class="hint" style="margin:14px 0 0;text-align:center" id="gNote">ผู้ใช้คนแรกของระบบจะได้สิทธิ์ผู้ดูแลระบบอัตโนมัติ</p>
+  </div>
+ </div>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="blogo">ผด</div>
+    <div><h1>ระบบจัดทำแผนการดำเนินงาน แบบ ผด.๐๒</h1>
+    <p>เทศบาลเมืองดอนแก้ว · ระเบียบ มท. ว่าด้วยแผนพัฒนาท้องถิ่น พ.ศ. 2548 และที่แก้ไขเพิ่มเติม</p></div>
+  </div>
+  <div class="who">
+    <span class="cloud" id="cloudState">•</span>
+    <span class="av" id="uAv">—</span>
+    <div><b id="uName">—</b><span id="uRole">—</span></div>
+    <button type="button" class="btn gh sm" data-act="logout">ออกจากระบบ</button>
+  </div>
+</header>
+
+<nav class="noprint">
+  <button type="button" class="on" data-tab="dash">📊 ภาพรวม</button>
+  <button type="button" data-tab="new">➕ บันทึกโครงการ</button>
+  <button type="button" data-tab="list">📋 ทะเบียนโครงการ</button>
+  <button type="button" data-tab="report">📅 รายงานรายเดือน</button>
+  <button type="button" data-tab="admin" id="navAdmin" hidden>✅ อนุมัติ</button>
+  <button type="button" data-tab="users" id="navUsers" hidden>👥 ผู้ใช้งาน</button>
+  <button type="button" data-tab="setting" id="navSetting" hidden>⚙️ ตั้งค่า</button>
+</nav>
+
+<main>
+<!-- ========== DASHBOARD ========== -->
+<div class="tabpane on" id="tab-dash">
+  <div class="card" style="padding:14px 18px;margin-bottom:16px">
+    <div class="cardhd" style="margin:0;align-items:center">
+      <div><h3 style="margin:0"><span class="ico">🗓</span>เลือกปีงบประมาณที่ต้องการวิเคราะห์</h3>
+      <p class="desc" style="margin:2px 0 0" id="dashScope">—</p></div>
+      <div class="yrpick"><label for="d_year">ปีงบประมาณ</label><select id="d_year"></select></div>
+    </div>
+  </div>
+  <div class="stats" id="statBox"></div>
+  <div class="card">
+    <h3><span class="ico">📈</span>งบประมาณตามแผนการดำเนินงานรายเดือน</h3>
+    <p class="desc" id="chartDesc">เฉลี่ยงบประมาณของแต่ละโครงการลงตามจำนวนเดือนที่ดำเนินการ — ช่วยดูภาระการเบิกจ่ายรายเดือน</p>
+    <div class="chart" id="chartBox"></div>
+    <div style="height:8px"></div>
+  </div>
+  <div class="card sec">
+    <h3><span class="ico">🏢</span>สัดส่วนงบประมาณแยกตามหน่วยงานรับผิดชอบ</h3>
+    <p class="desc">หน่วยงานที่รับผิดชอบงบประมาณตามแผนสูงสุด 5 อันดับแรก</p>
+    <div id="deptBox"></div>
+  </div>
+</div>
+
+<!-- ========== TAB NEW ========== -->
+<div class="tabpane" id="tab-new">
+  <div class="card">
+    <h3><span class="ico">📝</span>ข้อมูลหัวบัญชีโครงการพัฒนา</h3>
+    <p class="desc">ข้อมูลนี้จะปรากฏในส่วนหัวของแบบ ผด.๐๒ และใช้จัดกลุ่มโครงการในรายงาน</p>
+    <div class="grid g4">
+      <div><label>ปีงบประมาณ พ.ศ.</label><input id="f_year" value="2570"></div>
+      <div><label>ส่วนราชการผู้บันทึก</label><input id="f_dept" value="สำนักปลัดเทศบาล"></div>
+      <div><label>วันที่บันทึก</label><input type="date" id="f_date"></div>
+      <div><label>ลำดับบัญชี <span class="hint">(ผู้ดูแลกำหนด)</span></label><input id="f_seq" placeholder="ผู้ดูแลระบบกำหนดได้"></div>
+      <div style="grid-column:1/-1"><label>ประเด็นการพัฒนาท้องถิ่น</label>
+        <select id="f_strat"></select>
+        <input id="f_stratX" style="display:none;margin-top:6px" placeholder="ระบุประเด็นการพัฒนาท้องถิ่น"></div>
+      <div style="grid-column:1/span 2"><label>แผนงาน</label>
+        <select id="f_plan"></select>
+        <input id="f_planX" style="display:none;margin-top:6px" placeholder="ระบุแผนงาน"></div>
+      <div style="grid-column:3/span 2"><label>งาน</label>
+        <select id="f_work"><option value="">— เลือกแผนงานก่อน —</option></select>
+        <input id="f_workX" style="display:none;margin-top:6px" placeholder="ระบุงาน"></div>
+    </div>
+    <div class="modebox">ระบบจะจัดกลุ่มโครงการในเอกสาร ผด.๐๒ ตาม <b>ประเด็นการพัฒนาท้องถิ่น › แผนงาน</b> โดยอัตโนมัติ — โครงการที่อยู่คนละแผนงานให้บันทึกแยกชุดกัน</div>
+  </div>
+
+  <div class="card ter">
+    <h3><span class="ico">✍️</span>ผู้ลงนามในเอกสารฉบับนี้</h3>
+    <p class="desc">เว้นว่างไว้ระบบจะใช้ค่าจากหน้าตั้งค่ากลางแทน</p>
+    <div class="grid g2">
+      <div><label>ผู้จัดทำ (ชื่อ-นามสกุล)</label><input id="f_p1n" placeholder="เช่น นายนรเศรษฐ  ชุ่มถนอม"></div>
+      <div><label>ตำแหน่งผู้จัดทำ</label><input id="f_p1t" placeholder="เช่น นักวิเคราะห์นโยบายและแผน"></div>
+      <div><label>ผู้อำนวยการกองต้นสังกัด</label><input id="f_pdn" placeholder="เช่น นายเกรียงไกร  จันณะคำ"></div>
+      <div><label>ตำแหน่ง</label><input id="f_pdt" placeholder="เช่น ผู้อำนวยการกองช่าง"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="ico">🏗</span>รายการโครงการ / กิจกรรม</h3>
+    <p class="desc">เพิ่มได้หลายโครงการในชุดเดียว — ติ๊กเดือนที่ดำเนินการ ระบบจะวาดลูกศรช่วงเวลาในเอกสารให้อัตโนมัติ</p>
+    <div id="items"></div>
+    <button type="button" class="btn gh" id="btnAdd" data-act="add">➕ เพิ่มโครงการ</button>
+    <div class="tot" style="margin-top:16px" id="sumbox"><span>รวมงบประมาณทั้งสิ้น</span><span class="n">0.00 บาท</span></div>
+    <div id="warnbox"></div>
+  </div>
+
+  <div class="card noprint" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <button type="button" class="btn gh" data-act="save-draft">💾 บันทึกร่าง</button>
+    <button type="button" class="btn" data-act="save-wait">📨 บันทึก &amp; เสนอขอความเห็นชอบ</button>
+    <button type="button" class="btn sec" data-act="preview">👁 ดูตัวอย่างเอกสาร ผด.๐๒</button>
+    <button type="button" class="btn gh" data-act="reset">↺ ล้างฟอร์ม</button>
+    <span class="hint" id="editing"></span>
+  </div>
+</div>
+
+<!-- ========== TAB LIST ========== -->
+<div class="tabpane" id="tab-list">
+  <div class="card">
+    <h3><span class="ico">📋</span>ทะเบียนคุมโครงการตามแผนการดำเนินงาน</h3>
+    <p class="desc">เลือกปีงบประมาณเพื่อดูเฉพาะข้อมูลของปีนั้น — เจ้าหน้าที่แก้ไขได้เฉพาะชุดที่ตนเองบันทึก</p>
+    <div class="grid g4" style="margin-bottom:16px">
+      <div><label>ปีงบประมาณ</label><select id="q_year"></select></div>
+      <div><label>สถานะ</label><select id="q_st"><option value="">ทั้งหมด</option><option value="draft">ร่าง</option><option value="wait">รอความเห็นชอบ</option><option value="ok">อนุมัติแล้ว</option><option value="no">ไม่อนุมัติ</option></select></div>
+      <div><label>ค้นหา</label><input id="q_kw" placeholder="ประเด็นการพัฒนา / แผนงาน / โครงการ / ผู้บันทึก"></div>
+      <div style="align-self:end;display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn gh sm" data-act="csv">⬇ CSV</button>
+        <button type="button" class="btn gh sm" data-act="backup">💾 สำรอง</button>
+      </div>
+    </div>
+    <div class="sumbar" id="listSum"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <button type="button" class="btn sec sm" data-act="doc-all">📄 เปิดเอกสาร ผด.๐๒ ทั้งปี</button>
+      <span class="hint" style="align-self:center">รวมทุกชุดบันทึกของปีที่เลือก จัดกลุ่มตามประเด็นการพัฒนา › แผนงาน</span>
+    </div>
+    <div style="overflow:auto"><table class="list" id="tblist"></table></div>
+  </div>
+</div>
+
+<!-- ========== TAB REPORT ========== -->
+<div class="tabpane" id="tab-report">
+  <div class="card" style="padding:14px 18px">
+    <div class="cardhd" style="margin:0;align-items:center">
+      <div><h3 style="margin:0"><span class="ico">📅</span>รายงานสรุปแยกตามเดือนตามงบประมาณ</h3>
+      <p class="desc" style="margin:2px 0 0" id="rptScope">—</p></div>
+      <div class="yrpick">
+        <label for="r_only">เฉพาะที่อนุมัติ</label>
+        <select id="r_only"><option value="">ทุกสถานะ</option><option value="ok">อนุมัติแล้ว</option></select>
+        <label for="r_year">ปีงบประมาณ</label><select id="r_year"></select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3><span class="ico">📊</span>ตารางสรุปรายเดือน (ปีงบประมาณ ต.ค. – ก.ย.)</h3>
+    <p class="desc">งบประมาณเฉลี่ยลงเดือน = งบประมาณโครงการ ÷ จำนวนเดือนที่ดำเนินการ — ผลรวมทั้งปีจะเท่ากับงบประมาณรวมตามแผน</p>
+    <div style="overflow:auto"><table class="rpt" id="tbrpt"></table></div>
+    <div style="height:12px"></div>
+    <button type="button" class="btn sec sm" data-act="doc-month">📄 เปิดเอกสารรายงานสรุปรายเดือน</button>
+  </div>
+  <div class="card ter">
+    <h3><span class="ico">🏁</span>สรุปตามเดือนที่ดำเนินการแล้วเสร็จ</h3>
+    <p class="desc">ใช้ติดตามความคืบหน้าและวางแผนการเบิกจ่ายช่วงปลายปีงบประมาณ</p>
+    <div style="overflow:auto"><table class="rpt" id="tbfin"></table></div>
+  </div>
+</div>
+
+<!-- ========== TAB ADMIN ========== -->
+<div class="tabpane" id="tab-admin">
+  <div class="card"><h3><span class="ico">✅</span>ให้ความเห็นชอบและกำหนดลำดับบัญชี</h3>
+    <p class="desc">เฉพาะผู้ดูแลระบบ — กำหนดลำดับบัญชี วันที่ประกาศใช้ และสถานะการพิจารณา</p>
+    <div style="overflow:auto"><table class="list" id="tbadmin"></table></div>
+  </div>
+</div>
+
+<!-- ========== TAB USERS ========== -->
+<div class="tabpane" id="tab-users">
+  <div class="card sec"><h3><span class="ico">👥</span>จัดการผู้ใช้งานและสิทธิ์</h3>
+    <p class="desc">เฉพาะผู้ดูแลระบบ — ผู้ดูแลระบบเท่านั้นที่ดึงข้อมูลออกเป็นไฟล์ Word ได้</p>
+    <div style="overflow:auto"><table class="list" id="tbusers"></table></div>
+  </div>
+</div>
+
+<!-- ========== TAB SETTING ========== -->
+<div class="tabpane" id="tab-setting">
+  <div class="card"><h3><span class="ico">🏛</span>ตราสัญลักษณ์หัวเอกสาร</h3>
+    <p class="desc">ใช้บนหน้าปกและหัวรายงานสรุป (ไม่บังคับ)</p>
+    <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <img id="logoPrev" class="gpreview" alt="ตราสัญลักษณ์">
+      <div style="flex:1;min-width:250px">
+        <label>อัปโหลดไฟล์ (PNG พื้นหลังโปร่งใส แนะนำ 300×300 px)</label>
+        <input type="file" id="logoFile" accept="image/png,image/jpeg,image/svg+xml">
+        <div style="height:10px"></div>
+        <button type="button" class="btn gh sm" data-act="logo-reset">↺ ใช้ค่าเริ่มต้น</button>
+      </div>
+    </div>
+  </div>
+  <div class="card ter"><h3><span class="ico">✍️</span>ผู้ลงนามค่าเริ่มต้น</h3>
+    <p class="desc">ใช้เมื่อไม่ได้ระบุผู้ลงนามในชุดบันทึกนั้น — มีผลกับผู้ใช้ทุกคนในระบบ</p>
+    <div class="grid g2">
+      <div><label>ผู้จัดทำ (ชื่อ)</label><input id="s_p1n"></div>
+      <div><label>ผู้จัดทำ (ตำแหน่ง)</label><input id="s_p1t"></div>
+      <div><label>ผู้อำนวยการกอง (ค่าเริ่มต้น)</label><input id="s_pdn"></div>
+      <div><label>ตำแหน่ง</label><input id="s_pdt"></div>
+      <div><label>ผู้อำนวยการกองยุทธศาสตร์และงบประมาณ</label><input id="s_p2n"></div>
+      <div><label>ตำแหน่ง</label><input id="s_p2t"></div>
+      <div><label>ปลัดเทศบาล</label><input id="s_p3n"></div>
+      <div><label>ตำแหน่ง</label><input id="s_p3t"></div>
+      <div><label>ผู้อนุมัติ / ประกาศใช้</label><input id="s_p4n"></div>
+      <div><label>ตำแหน่ง</label><input id="s_p4t"></div>
+    </div>
+    <div style="height:14px"></div><button type="button" class="btn" data-act="save-setting">💾 บันทึกการตั้งค่า</button>
+  </div>
+  <div class="card"><h3><span class="ico">🗂</span>รายการหน่วยงานและประเด็นการพัฒนาท้องถิ่น</h3>
+    <p class="desc">หนึ่งบรรทัดต่อหนึ่งรายการ — ใช้เป็นตัวเลือกในฟอร์มบันทึกโครงการ</p>
+    <div class="grid g2">
+      <div><label>หน่วยงานรับผิดชอบหลัก</label><textarea id="s_depts" rows="7"></textarea></div>
+      <div><label>ประเด็นการพัฒนาท้องถิ่น</label><textarea id="s_strats" rows="8"></textarea></div>
+    </div>
+    <div style="height:14px"></div><button type="button" class="btn" data-act="save-lists">💾 บันทึกรายการ</button>
+  </div>
+</div>
+
+<!-- ========== DOC ========== -->
+<div id="docWrap" style="display:none">
+  <div class="docbar noprint">
+    <button type="button" class="btn ok" data-act="word" id="btnWord">📄 บันทึกเป็นไฟล์ Word</button>
+    <button type="button" class="btn sec" data-act="print">🖨 พิมพ์ / PDF</button>
+    <button type="button" class="btn gh" data-act="present">🖥 โหมดนำเสนอ</button>
+    <button type="button" class="btn gh hidepres" data-act="closedoc">✕ ปิด</button>
+    <span class="hint" id="docNote"></span>
+  </div>
+  <div id="doc"></div>
+</div>
+</main>
+
+<script type="module">
+/* ============ ใส่ค่า Firebase ตรงนี้ (เว้นว่าง = ออฟไลน์) ============ */
+const FIREBASE_CONFIG={apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""};
+
+let FB=null,USE_CLOUD=false;
+if(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId){
+  try{
+    const[appM,authM,fsM]=await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")]);
+    const app=appM.initializeApp(FIREBASE_CONFIG);
+    FB={auth:authM.getAuth(app),db:fsM.getFirestore(app),A:authM,F:fsM};USE_CLOUD=true;
+  }catch(e){console.warn("Firebase offline",e)}
+}
+
+const q=(s,r)=>(r||document).querySelector(s);
+const qa=(s,r)=>Array.prototype.slice.call((r||document).querySelectorAll(s));
+const el=id=>document.getElementById(id);
+const val=id=>{const e=el(id);return e?e.value:""};
+const setVal=(id,v)=>{const e=el(id);if(e)e.value=(v==null?"":v)};
+const up=(t,sel)=>{if(!t)return null;if(t.nodeType===3)t=t.parentElement;return t&&t.closest?t.closest(sel):null};
+const num=v=>{v=parseFloat(String(v==null?"":v).replace(/,/g,""));return isNaN(v)?0:v};
+const fm=v=>num(v).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmi=v=>{const n=num(v);return n%1===0?n.toLocaleString("th-TH"):fm(n)};
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function showErr(m){let d=el('errbox');if(!d){d=document.createElement('div');d.id='errbox';document.body.appendChild(d)}d.innerHTML='<b>⚠ พบข้อผิดพลาด</b>'+String(m)}
+window.addEventListener('error',e=>showErr(e.message));
+
+const TH_NUM=["๐","๑","๒","๓","๔","๕","๖","๗","๘","๙"];
+const toThaiNum=s=>String(s).replace(/[0-9]/g,d=>TH_NUM[+d]);
+
+const AVC=["#0D9488","#9333EA","#EC4899","#3B82F6","#F59E0B","#10B981","#6366F1","#EF4444","#14B8A6","#A855A8"];
+function hashIdx(s){let h=0;s=String(s||"");for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h%AVC.length}
+const avColor=s=>AVC[hashIdx(s)];
+const avChar=n=>String(n||"?").trim().charAt(0).toUpperCase();
+
+const LOGO_DEFAULT="data:image/svg+xml;base64,"+btoa(unescape(encodeURIComponent(
+`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><g fill="none" stroke="#0D9488" stroke-width="5">
+<circle cx="60" cy="60" r="52"/><path d="M34 74V52l26-20 26 20v22z" stroke-linejoin="round"/>
+<path d="M48 74V62h24v12"/></g><circle cx="60" cy="30" r="5" fill="#9333EA"/></svg>`)));
+
+/* ====== เดือนตามปีงบประมาณ ต.ค. -> ก.ย. ====== */
+const MON =["ต.ค.","พ.ย.","ธ.ค.","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."];
+const MONF=["ตุลาคม","พฤศจิกายน","ธันวาคม","มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน"];
+const TH_MS=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+
+const PLANS={
+"แผนงานบริหารงานทั่วไป":["งานบริหารทั่วไป","งานวางแผนสถิติและวิชาการ","งานบริหารงานคลัง","งานควบคุมภายในและการตรวจสอบภายใน","งานสารสนเทศ"],
+"แผนงานการรักษาความสงบภายใน":["งานบริหารทั่วไปเกี่ยวกับการรักษาความสงบภายใน","งานเทศกิจ","งานป้องกันและบรรเทาสาธารณภัย","งานจราจร"],
+"แผนงานการศึกษา":["งานบริหารทั่วไปเกี่ยวกับการศึกษา","งานระดับก่อนวัยเรียนและประถมศึกษา","งานระดับมัธยมศึกษา","งานศึกษาไม่กำหนดระดับ"],
+"แผนงานสาธารณสุข":["งานบริหารทั่วไปเกี่ยวกับสาธารณสุข","งานโรงพยาบาล","งานบริการสาธารณสุขและงานสาธารณสุขอื่น","งานศูนย์บริการสาธารณสุข"],
+"แผนงานสังคมสงเคราะห์":["งานบริหารทั่วไปเกี่ยวกับสังคมสงเคราะห์","งานสวัสดิการสังคมและสังคมสงเคราะห์"],
+"แผนงานเคหะและชุมชน":["งานบริหารทั่วไปเกี่ยวกับเคหะและชุมชน","งานไฟฟ้าและประปา","งานสวนสาธารณะ","งานกำจัดขยะมูลฝอยและสิ่งปฏิกูล","งานบำบัดน้ำเสีย"],
+"แผนงานสร้างความเข้มแข็งของชุมชน":["งานบริหารทั่วไปเกี่ยวกับสร้างความเข้มแข็งของชุมชน","งานส่งเสริมและสนับสนุนความเข้มแข็งชุมชน"],
+"แผนงานการศาสนา วัฒนธรรม และนันทนาการ":["งานบริหารทั่วไปเกี่ยวกับศาสนาวัฒนธรรมและนันทนาการ","งานกีฬาและนันทนาการ","งานศาสนาวัฒนธรรมท้องถิ่น","งานวิชาการวางแผนและส่งเสริมการท่องเที่ยว"],
+"แผนงานอุตสาหกรรมและการโยธา":["งานบริหารทั่วไปเกี่ยวกับอุตสาหกรรมและการโยธา","งานก่อสร้าง"],
+"แผนงานการเกษตร":["งานส่งเสริมการเกษตร","งานสิ่งแวดล้อมและทรัพยากรธรรมชาติ"],
+"แผนงานการพาณิชย์":["งานกิจการสถานธนานุบาล","งานกิจการประปา","งานตลาดสด","งานโรงฆ่าสัตว์","งานกิจการสถานีขนส่ง/กิจการท่าเรือ","งานกิจการพาณิชย์อื่น ๆ"],
+"แผนงานงบกลาง":["งบกลาง"]};
+
+const OTHER="อื่น ๆ (ระบุเอง)";
+const LKEY="dk_plan_v2",LSET="dk_planset_v2",LUSR="dk_planusr_v2";
+const STL={draft:["ร่าง","b-draft"],wait:["รอความเห็นชอบ","b-wait"],ok:["อนุมัติแล้ว","b-ok"],no:["ไม่อนุมัติ","b-no"]};
+const STLget=k=>STL[k]||["ไม่ระบุ","b-draft"];
+
+const DEF_DEPTS=["สำนักปลัดเทศบาล","กองคลัง","กองช่าง","กองการศึกษา","กองสาธารณสุขและสิ่งแวดล้อม",
+  "กองสวัสดิการสังคม","กองยุทธศาสตร์และงบประมาณ","หน่วยตรวจสอบภายใน"];
+
+const DEF_STRATS=[
+"1. การพัฒนาเมืองแห่งสุขภาวะและชุมชนดูแลประคับประคอง (Wellness & Caring Community)",
+"2. การยกระดับเศรษฐกิจชุมชนด้วยการท่องเที่ยวเชิงนิเวศและวัฒนธรรมล้านนาสร้างสรรค์ (Eco-Cultural Tourism)",
+"3. การจัดการสิ่งแวดล้อมยั่งยืนและการรับมือการเปลี่ยนแปลงสภาพภูมิอากาศ (Sustainable Environment & Climate Action)",
+"4. การบริหารจัดการเมืองอัจฉริยะและการมีส่วนร่วมของพลเมือง (Smart & Inclusive Governance)",
+"5. การพัฒนาโครงสร้างพื้นฐานยืดหยุ่นและอารยสถาปัตย์เพื่อทุกคน (Resilient Infrastructure & Universal Design)"];
+
+const DEF_SET={p1n:"นายนรเศรษฐ  ชุ่มถนอม",p1t:"นักวิเคราะห์นโยบายและแผน",
+  pdn:"",pdt:"ผู้อำนวยการกอง",
+  p2n:"นางสาวสุปวีณ์  ศรีโสดา",p2t:"ผู้อำนวยการกองยุทธศาสตร์และงบประมาณ",
+  p3n:"นายวิชาติ  นาวาพิสุทธิ์",p3t:"ปลัดเทศบาลเมืองดอนแก้ว",
+  p4n:"นายพลากร  กันธวัง",p4t:"นายกเทศมนตรีเมืองดอนแก้ว",
+  logo:"",depts:DEF_DEPTS.join("\n"),strats:DEF_STRATS.join("\n")};
+
+const thDate=iso=>{if(!iso)return"";const d=new Date(iso);if(isNaN(d.getTime()))return"";
+  return toThaiNum(d.getDate())+" "+MONF[(d.getMonth()+3)%12-((d.getMonth()+3)%12)]+""};
+const thDateEn=iso=>{if(!iso)return"-";const d=new Date(iso);if(isNaN(d.getTime()))return"-";
+  return d.getDate()+" "+TH_MS[d.getMonth()]+" "+(d.getFullYear()+543)};
+
+let ME={uid:"local",name:"ผู้ใช้ออฟไลน์",email:"offline@local",dept:"",role:"admin"};
+let RECS=[],SETTING={...DEF_SET},USERS=[];
+let seqId=0,editId=null,curDoc=null,gtMode="in";
+const isAdmin=()=>ME.role==="admin";
+const lget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
+const lset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const listDepts=()=>String(SETTING.depts||"").split("\n").map(s=>s.trim()).filter(Boolean);
+const listStrats=()=>String(SETTING.strats||"").split("\n").map(s=>s.trim()).filter(Boolean);
+
+async function dbSaveRec(r){
+  if(USE_CLOUD){const{doc,setDoc}=FB.F;await setDoc(doc(FB.db,"plans",r.id),r)}
+  else{const l=lget(LKEY,[]);const i=l.findIndex(x=>x.id===r.id);i>=0?l[i]=r:l.unshift(r);lset(LKEY,l);RECS=l;renderAll()}
+}
+async function dbDelRec(id){
+  if(USE_CLOUD){const{doc,deleteDoc}=FB.F;await deleteDoc(doc(FB.db,"plans",id))}
+  else{const l=lget(LKEY,[]).filter(x=>x.id!==id);lset(LKEY,l);RECS=l;renderAll()}
+}
+async function dbSaveSetting(s){
+  if(USE_CLOUD){const{doc,setDoc}=FB.F;await setDoc(doc(FB.db,"plan_settings","main"),s)}
+  else{lset(LSET,s);SETTING=s;applySettingUI()}
+}
+async function dbSetRole(uid,role){
+  if(USE_CLOUD){const{doc,updateDoc}=FB.F;await updateDoc(doc(FB.db,"users",uid),{role})}
+  else{const l=lget(LUSR,[]);const u=l.find(x=>x.uid===uid);if(u)u.role=role;lset(LUSR,l);USERS=l;renderUsers()}
+}
+
+/* ============ AUTH ============ */
+function gerr(m){const e=el("gerr");if(!m){e.style.display="none";return}e.style.display="block";e.textContent=m}
+const AUTH_MSG={"auth/invalid-email":"รูปแบบอีเมลไม่ถูกต้อง","auth/user-not-found":"ไม่พบผู้ใช้นี้ในระบบ","auth/wrong-password":"รหัสผ่านไม่ถูกต้อง","auth/invalid-credential":"อีเมลหรือรหัสผ่านไม่ถูกต้อง","auth/email-already-in-use":"อีเมลนี้ถูกใช้สมัครแล้ว","auth/weak-password":"รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร","auth/too-many-requests":"พยายามเข้าสู่ระบบบ่อยเกินไป"};
+function setGateMode(m){
+  gtMode=m;el("tabSignin").classList.toggle("on",m==="in");el("tabSignup").classList.toggle("on",m==="up");
+  el("rowName").style.display=m==="up"?"block":"none";el("rowDept").style.display=m==="up"?"block":"none";
+  el("gBtn").textContent=m==="up"?"สมัครสมาชิก":"เข้าสู่ระบบ";gerr("");
+}
+async function doAuth(){
+  gerr("");const email=val("g_email").trim(),pw=val("g_pw");
+  if(!email||!pw){gerr("กรุณากรอกอีเมลและรหัสผ่าน");return}
+  if(!USE_CLOUD){ME.name=val("g_name").trim()||email.split("@")[0];ME.email=email;ME.dept=val("g_dept").trim();enterApp();return}
+  const b=el("gBtn");b.disabled=true;b.textContent="กำลังดำเนินการ...";
+  try{
+    const{createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile}=FB.A;
+    if(gtMode==="up"){
+      const name=val("g_name").trim()||email.split("@")[0];
+      const cred=await createUserWithEmailAndPassword(FB.auth,email,pw);
+      await updateProfile(cred.user,{displayName:name});
+      const{doc,setDoc,getDocs,collection}=FB.F;let role="user";
+      try{const s=await getDocs(collection(FB.db,"users"));if(s.empty)role="admin"}catch(e){role="admin"}
+      await setDoc(doc(FB.db,"users",cred.user.uid),{uid:cred.user.uid,name,email,dept:val("g_dept").trim(),role,created:new Date().toISOString()});
+    }else await signInWithEmailAndPassword(FB.auth,email,pw);
+  }catch(e){gerr(AUTH_MSG[e.code]||e.message)}finally{b.disabled=false;setGateMode(gtMode)}
+}
+function enterApp(){
+  el("gate").style.display="none";el("uName").textContent=ME.name;
+  el("uRole").textContent=(isAdmin()?"ผู้ดูแลระบบ":"เจ้าหน้าที่")+(ME.dept?" · "+ME.dept:"");
+  const av=el("uAv");av.textContent=avChar(ME.name);av.style.background=avColor(ME.uid||ME.email);
+  el("navAdmin").hidden=!isAdmin();el("navUsers").hidden=!isAdmin();el("navSetting").hidden=!isAdmin();
+  el("cloudState").textContent=USE_CLOUD?"☁ คลาวด์":"💾 ออฟไลน์";
+  if(ME.dept&&!val("f_dept"))setVal("f_dept",ME.dept);
+  if(!val("f_p1n")){setVal("f_p1n",ME.name||"");setVal("f_p1t",SETTING.p1t||"")}
+  fillHeadSelects();
+  if(!el("items").children.length)addItem();
+  renderAll();
+}
+async function logout(){if(USE_CLOUD)await FB.A.signOut(FB.auth);else location.reload()}
+
+if(USE_CLOUD){
+  const{onAuthStateChanged}=FB.A;const{doc,getDoc,setDoc,collection,onSnapshot,query,orderBy}=FB.F;
+  onAuthStateChanged(FB.auth,async u=>{
+    if(!u){el("gate").style.display="flex";ME={role:"user"};return}
+    let prof={name:u.displayName||u.email,email:u.email,dept:"",role:"user"};
+    try{const s=await getDoc(doc(FB.db,"users",u.uid));
+      if(s.exists())prof={...prof,...s.data()};
+      else await setDoc(doc(FB.db,"users",u.uid),{uid:u.uid,...prof,created:new Date().toISOString()});
+    }catch(e){console.warn(e)}
+    ME={uid:u.uid,...prof};enterApp();
+    onSnapshot(query(collection(FB.db,"plans"),orderBy("created","desc")),s=>{RECS=s.docs.map(d=>d.data());renderAll()},e=>showErr(e.message));
+    onSnapshot(doc(FB.db,"plan_settings","main"),s=>{SETTING={...DEF_SET,...(s.data()||{})};applySettingUI();fillHeadSelects()});
+    onSnapshot(collection(FB.db,"users"),s=>{USERS=s.docs.map(d=>d.data());renderUsers()});
+  });
+}else{
+  RECS=lget(LKEY,[]);SETTING={...DEF_SET,...lget(LSET,{})};USERS=lget(LUSR,[]);
+  el("gNote").textContent="⚠ ยังไม่ได้ตั้งค่า Firebase — ระบบทำงานแบบออฟไลน์";
+}
+
+/* ============ ปีงบประมาณ ============ */
+function allYears(){
+  const set=new Set();
+  RECS.forEach(r=>{const y=String(r.year||"").trim();if(y)set.add(y)});
+  const cur=String(val("f_year")||"").trim();if(cur)set.add(cur);
+  return Array.from(set).sort((a,b)=>num(b)-num(a));
+}
+function fillYearSelect(id,allLabel,forceFirst){
+  const s=el(id);if(!s)return;
+  const keep=s.value,ys=allYears();
+  s.innerHTML=(forceFirst?"":`<option value="">${allLabel}</option>`)
+    +ys.map(y=>`<option value="${esc(y)}">ปีงบประมาณ ${esc(y)}</option>`).join("");
+  if(keep&&ys.includes(keep))s.value=keep;
+  else if(forceFirst&&ys.length)s.value=ys[0];
+}
+function refreshYearPickers(){
+  fillYearSelect("d_year","ทุกปีงบประมาณ");
+  fillYearSelect("q_year","ทุกปีงบประมาณ");
+  fillYearSelect("r_year","",true);
+}
+const opt=(arr,ph)=>'<option value="">— '+ph+' —</option>'+arr.map(a=>"<option>"+esc(a)+"</option>").join("")+"<option>"+OTHER+"</option>";
+function fillHeadSelects(){
+  const st=el("f_strat"),pl=el("f_plan");if(!st||!pl)return;
+  const k1=st.value,k2=pl.value;
+  st.innerHTML=opt(listStrats(),"เลือกประเด็นการพัฒนาท้องถิ่น");
+  pl.innerHTML=opt(Object.keys(PLANS),"เลือกแผนงาน");
+  if(k1)st.value=k1;if(k2)pl.value=k2;syncHeadWork();
+  qa('select[data-f="dept"]').forEach(s=>{const k=s.value;s.innerHTML=opt(listDepts(),"เลือกหน่วยงาน");if(k)s.value=k});
+}
+function syncHeadWork(){
+  const p=val("f_plan"),w=el("f_work");if(!w)return;
+  el("f_planX").style.display=(p===OTHER)?"block":"none";
+  el("f_stratX").style.display=(val("f_strat")===OTHER)?"block":"none";
+  w.innerHTML=(p&&PLANS[p])?opt(PLANS[p],"เลือกงาน"):'<option value="">— เลือกแผนงานก่อน —</option>';
+}
+
+/* ============ DASHBOARD ============ */
+function flatItems(data){const out=[];data.forEach(r=>(r.items||[]).forEach(x=>out.push({...x,_r:r})));return out}
+function renderDash(){
+  const box=el("statBox");if(!box)return;
+  const yy=val("d_year");
+  const data=yy?RECS.filter(r=>String(r.year||"")===yy):RECS;
+  const its=flatItems(data);
+  el("dashScope").textContent=yy
+    ?`แสดงข้อมูลเฉพาะปีงบประมาณ พ.ศ. ${yy} — ${data.length} ชุดบันทึก / ${its.length} โครงการ`
+    :`แสดงข้อมูลรวมทุกปีงบประมาณ — ${data.length} ชุดบันทึก / ${its.length} โครงการ`;
+  el("chartDesc").textContent=yy
+    ?`งบประมาณเฉลี่ยลงเดือนของปีงบประมาณ พ.ศ. ${yy} (ต.ค. ${num(yy)-1} – ก.ย. ${yy})`
+    :"งบประมาณเฉลี่ยลงเดือนรวมทุกปีงบประมาณ — เลือกปีด้านบนเพื่อดูแยกรายปี";
+
+  const tot=its.reduce((s,x)=>s+num(x.budget),0);
+  const ok=data.filter(r=>r.status==="ok").length;
+  const wait=data.filter(r=>r.status==="wait").length;
+  const done=its.filter(x=>x.fmn!==""&&x.fmn!=null).length;
+  const cards=[
+    {l:"โครงการทั้งหมด",v:its.length.toLocaleString("th-TH"),s:data.length+" ชุดบันทึก",i:"🏗",c:"var(--pri)",b:"var(--pri-bg)"},
+    {l:"งบประมาณตามแผน",v:fm(tot),s:"บาท",i:"💰",c:"var(--sec)",b:"var(--sec-bg)"},
+    {l:"ชุดที่อนุมัติแล้ว",v:ok.toLocaleString("th-TH"),s:data.length?Math.round(ok/data.length*100)+"% ของทั้งหมด":"—",i:"✅",c:"var(--ok)",b:"#ECFDF5"},
+    {l:"รอความเห็นชอบ",v:wait.toLocaleString("th-TH"),s:done?done+" โครงการระบุเดือนแล้วเสร็จ":"ไม่มีค้าง",i:"⏳",c:"var(--warn)",b:"#FFFBEB"}];
+  box.innerHTML=cards.map(c=>`<div class="stat" style="--c:${c.c};--cbg:${c.b}">
+    <div class="ico">${c.i}</div><div class="lbl">${c.l}</div>
+    <div class="val">${c.v}</div><div class="sub">${c.s}</div></div>`).join("");
+
+  const mon=monthSpread(its);
+  const mx=Math.max(...mon,1);
+  el("chartBox").innerHTML=mon.map((v,i)=>{
+    const h=v>0?Math.max(6,Math.round(v/mx*128)):3;
+    return `<div class="bar"><div class="col${i>2?" q2":""}" style="height:${h}px" data-v="${v>0?Math.round(v/1000).toLocaleString("th-TH")+"K":""}"></div>
+    <div class="cap">${MON[i]}</div></div>`}).join("");
+
+  const dm={};its.forEach(x=>{const d=x.dept||"ไม่ระบุ";dm[d]=(dm[d]||0)+num(x.budget)});
+  const top=Object.entries(dm).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const mxd=top.length?top[0][1]:1;
+  const COL=["var(--pri)","var(--sec)","var(--ter)","var(--info)","var(--warn)"];
+  el("deptBox").innerHTML=top.length?top.map(([d,v],i)=>`
+    <div style="margin-bottom:13px">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+        <b>${esc(d)}</b><span style="color:var(--mute)">${fm(v)} บาท</span></div>
+      <div style="height:8px;background:var(--line2);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${Math.round(v/mxd*100)}%;background:${COL[i]};border-radius:99px;transition:width .6s"></div></div>
+    </div>`).join(""):'<div class="empty"><div class="e">📊</div>ยังไม่มีข้อมูลในปีงบประมาณที่เลือก</div>';
+}
+function monthSpread(its){
+  const mon=new Array(12).fill(0);
+  its.forEach(x=>{const ms=x.ms||[];const n=ms.filter(Boolean).length;if(!n)return;
+    const per=num(x.budget)/n;ms.forEach((on,i)=>{if(on)mon[i]+=per})});
+  return mon;
+}
+
+/* ============ ฟอร์มโครงการ ============ */
+function monthBoxes(){
+  return MON.map((m,i)=>`<label class="mchk" data-m="${i}"><input type="checkbox" data-f="m${i}">${m}
+    <span class="yr">${i<3?"ปีก่อน":""}</span></label>`).join("");
+}
+function addItem(d){
+  const box=el("items");if(!box)return null;
+  seqId++;const div=document.createElement("div");
+  div.className="item";div.id="it"+seqId;
+  div.innerHTML=`<div class="hd"><span class="nm">โครงการที่ –</span>
+    <button type="button" class="btn dg sm" data-act="del-item">🗑 ลบ</button></div>
+    <div class="bd">
+      <div class="side inf"><h4>📌 ข้อมูลโครงการ</h4>
+        <div class="grid g2">
+          <div><label>โครงการ / กิจกรรม *</label><input data-f="name" placeholder="เช่น โครงการก่อสร้างถนน ค.ส.ล. ซอย ๔/๑ บ้านห้วยตึงเฒ่า หมู่ที่ ๓"></div>
+          <div><label>สถานที่ดำเนินการ</label><input data-f="loc" placeholder="เช่น ซอย ๔/๑ บ้านห้วยตึงเฒ่า หมู่ที่ ๓"></div>
+        </div>
+        <div style="height:12px"></div>
+        <label>รายละเอียดของกิจกรรมที่เกิดขึ้นจากโครงการ</label>
+        <textarea data-f="detail" rows="3" placeholder="เพื่อจ่ายเป็นค่าโครงการ... รายละเอียดตามประมาณการงานก่อสร้าง และตามแบบแปลนที่เทศบาลเมืองดอนแก้วกำหนด"></textarea>
+        <div style="height:12px"></div>
+        <div class="grid g2">
+          <div><label>งบประมาณ (บาท) *</label><input type="number" step="0.01" data-f="budget"></div>
+          <div><label>หน่วยงานรับผิดชอบหลัก</label><select data-f="dept">${opt(listDepts(),"เลือกหน่วยงาน")}</select></div>
+        </div>
+      </div>
+      <div class="side tim"><h4>🗓 ห้วงเวลาดำเนินการ</h4>
+        <div class="qrow">
+          <button type="button" class="btn gh sm" data-act="q-all">ทั้งปี</button>
+          <button type="button" class="btn gh sm" data-act="q-q1">ไตรมาส ๑</button>
+          <button type="button" class="btn gh sm" data-act="q-q2">ไตรมาส ๒</button>
+          <button type="button" class="btn gh sm" data-act="q-q3">ไตรมาส ๓</button>
+          <button type="button" class="btn gh sm" data-act="q-q4">ไตรมาส ๔</button>
+          <button type="button" class="btn gh sm" data-act="q-clr">ล้าง</button>
+        </div>
+        <div class="mgrid">${monthBoxes()}</div>
+        <div style="height:13px"></div>
+        <div class="grid g3">
+          <div><label>ดำเนินการแล้วเสร็จ (เดือน)</label>
+            <select data-f="fmn"><option value="">— ไม่ระบุ —</option>${MONF.map((m,i)=>`<option value="${i}">${m}</option>`).join("")}</select></div>
+          <div><label>ปี พ.ศ.</label><input data-f="fyr" placeholder="2570"></div>
+          <div><label>จำนวนเดือน / เฉลี่ยต่อเดือน</label><input data-f="avg" readonly class="ro"></div>
+        </div>
+      </div>
+    </div>`;
+  box.appendChild(div);if(d)fillItem(div,d);renum();calc();return div;
+}
+const renum=()=>qa("#items .item").forEach((it,i)=>{const n=q(".nm",it);if(n)n.textContent="โครงการที่ "+(i+1)});
+function readItem(it){
+  const g=f=>{const e=q(`[data-f="${f}"]`,it);return e?e.value:""};
+  const ms=[];for(let i=0;i<12;i++){const c=q(`[data-f="m${i}"]`,it);ms.push(!!(c&&c.checked))}
+  return {name:g("name"),detail:g("detail"),budget:num(g("budget")),loc:g("loc"),dept:g("dept"),
+    ms,fmn:g("fmn"),fyr:g("fyr")};
+}
+function fillItem(it,d){
+  const s=(f,v)=>{const e=q(`[data-f="${f}"]`,it);if(e)e.value=(v==null?"":v)};
+  s("name",d.name);s("detail",d.detail);s("budget",d.budget);s("loc",d.loc);s("dept",d.dept);
+  s("fmn",d.fmn);s("fyr",d.fyr);
+  (d.ms||[]).forEach((v,i)=>{const c=q(`[data-f="m${i}"]`,it);if(c){c.checked=!!v;const lb=up(c,".mchk");if(lb)lb.classList.toggle("on",!!v)}});
+}
+function calc(){
+  let n=0,total=0;const warn=[];
+  qa("#items .item").forEach((it,i)=>{
+    const d=readItem(it);const cnt=d.ms.filter(Boolean).length;
+    const a=q('[data-f="avg"]',it);
+    if(a)a.value=cnt?cnt+" เดือน · "+fm(d.budget/cnt)+" บ./เดือน":"ยังไม่เลือกเดือน";
+    qa(".mchk",it).forEach(lb=>{const c=q("input",lb);lb.classList.toggle("on",!!(c&&c.checked))});
+    if(d.name&&!cnt)warn.push("โครงการที่ "+(i+1)+" : ยังไม่ได้เลือกห้วงเวลาดำเนินการ");
+    if(d.name&&d.budget<=0)warn.push("โครงการที่ "+(i+1)+" : ยังไม่ได้กรอกงบประมาณ");
+    n++;total+=d.budget;
+  });
+  el("sumbox").innerHTML=`<span>รวมงบประมาณทั้งสิ้น · ${n} โครงการ</span><span class="n">${fm(total)} บาท</span>`;
+  el("warnbox").innerHTML=warn.length?'<div class="warn">⚠ '+warn.join("<br>⚠ ")+"</div>":"";
+}
+function quickMonth(it,mode){
+  const set=(a,b,v)=>{for(let i=a;i<=b;i++){const c=q(`[data-f="m${i}"]`,it);if(c)c.checked=v}};
+  if(mode==="all")set(0,11,true);
+  else if(mode==="clr")set(0,11,false);
+  else{const k={q1:[0,2],q2:[3,5],q3:[6,8],q4:[9,11]}[mode];if(k){set(0,11,false);set(k[0],k[1],true)}}
+  calc();
+}
+
+/* ============ บันทึก ============ */
+function readForm(){
+  const items=qa("#items .item").map(readItem).filter(x=>x.name||x.budget>0);
+  const pick=(a,b)=>val(a)===OTHER?val(b):val(a);
+  return {id:editId||("P"+Date.now()+"-"+Math.random().toString(36).slice(2,7)),
+    year:val("f_year"),dept:val("f_dept"),date:val("f_date"),seq:val("f_seq"),
+    strat:pick("f_strat","f_stratX"),plan:pick("f_plan","f_planX"),work:pick("f_work","f_workX"),
+    p1n:val("f_p1n"),p1t:val("f_p1t"),pdn:val("f_pdn"),pdt:val("f_pdt"),
+    items,total:items.reduce((s,x)=>s+num(x.budget),0),
+    created:new Date().toISOString(),ownerUid:ME.uid,ownerName:ME.name,ownerEmail:ME.email};
+}
+async function saveRec(st){
+  const r=readForm();
+  if(!r.items.length){alert("กรุณาเพิ่มโครงการอย่างน้อย 1 รายการ");return}
+  if(r.items.some(x=>!x.name)){alert("กรุณากรอกชื่อโครงการ/กิจกรรมให้ครบทุกรายการ");return}
+  if(r.items.some(x=>num(x.budget)<=0)){alert("กรุณากรอกงบประมาณให้ครบทุกโครงการ");return}
+  const old=RECS.find(x=>x.id===r.id)||{};
+  if(old.ownerUid){r.ownerUid=old.ownerUid;r.ownerName=old.ownerName;r.ownerEmail=old.ownerEmail;r.created=old.created}
+  r.status=(st==="draft")?"draft":((old.status&&old.status!=="draft")?old.status:"wait");
+  r.aSeq=old.aSeq||r.seq||"";r.aDate=old.aDate||"";r.remark=old.remark||"";
+  r.updated=new Date().toISOString();r.updatedBy=ME.name;
+  try{await dbSaveRec(r);editId=r.id;
+    el("editing").textContent="✅ บันทึกแล้ว · รหัส "+r.id;
+    alert(st==="draft"?"บันทึกร่างเรียบร้อย":"บันทึกและเสนอขอความเห็นชอบเรียบร้อย");
+  }catch(e){alert("บันทึกไม่สำเร็จ: "+e.message)}
+}
+function resetForm(){editId=null;el("items").innerHTML="";addItem();setVal("f_seq","");el("editing").textContent=""}
+function editRec(id){
+  const r=RECS.find(x=>x.id===id);if(!r)return;
+  if(!isAdmin()&&r.ownerUid!==ME.uid){alert("คุณแก้ไขได้เฉพาะชุดบันทึกที่ตนเองบันทึกเท่านั้น");return}
+  editId=id;
+  setVal("f_year",r.year);setVal("f_dept",r.dept);setVal("f_date",r.date);setVal("f_seq",r.aSeq||r.seq);
+  const has=(id2,v)=>Array.prototype.some.call(el(id2).options,o=>o.value===v);
+  if(has("f_strat",r.strat))setVal("f_strat",r.strat);else{setVal("f_strat",OTHER);setVal("f_stratX",r.strat)}
+  if(has("f_plan",r.plan))setVal("f_plan",r.plan);else{setVal("f_plan",OTHER);setVal("f_planX",r.plan)}
+  syncHeadWork();
+  if(has("f_work",r.work))setVal("f_work",r.work);else{setVal("f_work",OTHER);el("f_workX").style.display="block";setVal("f_workX",r.work)}
+  setVal("f_p1n",r.p1n||"");setVal("f_p1t",r.p1t||"");setVal("f_pdn",r.pdn||"");setVal("f_pdt",r.pdt||"");
+  el("items").innerHTML="";(r.items||[]).forEach(d=>addItem(d));
+  calc();el("editing").textContent="✏️ กำลังแก้ไข · รหัส "+id;
+  gotoTab("new");window.scrollTo(0,0);
+}
+async function delRec(id){
+  const r=RECS.find(x=>x.id===id);if(!r)return;
+  if(!isAdmin()&&r.ownerUid!==ME.uid){alert("คุณลบได้เฉพาะชุดบันทึกที่ตนเองบันทึกเท่านั้น");return}
+  if(!confirm("ยืนยันลบชุดบันทึกนี้?"))return;
+  try{await dbDelRec(id)}catch(e){alert("ลบไม่สำเร็จ: "+e.message)}
+}
+
+/* ============ ตาราง ============ */
+function renderAll(){refreshYearPickers();renderDash();renderList();renderReport();renderAdmin();renderUsers()}
+function ownerCell(r){
+  const c=avColor(r.ownerUid||r.ownerEmail||r.ownerName);
+  return `<div class="owner"><span class="av" style="background:${c}">${avChar(r.ownerName)}</span>
+   <div><div style="font-weight:600">${esc(r.ownerName||"-")}</div><span class="hint">${esc(r.ownerEmail||"")}</span></div></div>`;
+}
+function miniBar(items){
+  const m=new Array(12).fill(false);
+  (items||[]).forEach(x=>(x.ms||[]).forEach((v,i)=>{if(v)m[i]=true}));
+  return '<span class="mini">'+m.map(v=>`<i class="${v?"on":""}"></i>`).join("")+"</span>";
+}
+function filtered(){
+  const kw=val("q_kw").trim(),yy=val("q_year"),st=val("q_st");
+  return RECS.filter(r=>(!st||r.status===st)&&(!yy||String(r.year||"")===yy)&&(!kw||JSON.stringify(r).includes(kw)));
+}
+function renderList(){
+  const t=el("tblist");if(!t)return;
+  const l=filtered(),yy=val("q_year");
+  const its=flatItems(l);
+  const tot=its.reduce((s,x)=>s+num(x.budget),0);
+  const ok=l.filter(r=>r.status==="ok").length,wait=l.filter(r=>r.status==="wait").length;
+  el("listSum").innerHTML=`
+    <div class="sumpill">${yy?"ปีงบประมาณ "+esc(yy):"ทุกปีงบประมาณ"}<b>${l.length} ชุด / ${its.length} โครงการ</b></div>
+    <div class="sumpill">งบประมาณรวม<b style="color:var(--sec)">${fm(tot)} บาท</b></div>
+    <div class="sumpill">อนุมัติแล้ว<b style="color:var(--ok)">${ok}</b></div>
+    <div class="sumpill">รอความเห็นชอบ<b style="color:var(--warn)">${wait}</b></div>`;
+  let h='<tr><th>ลำดับ</th><th>ประเด็นการพัฒนา / แผนงาน</th><th>ปีงบ</th><th class="center">โครงการ</th><th class="right">งบประมาณ</th><th class="center">ห้วงเวลา</th><th>ผู้บันทึก</th><th class="center">สถานะ</th><th class="center">จัดการ</th></tr>';
+  h+=l.length?l.map(r=>{const s=STLget(r.status),mine=r.ownerUid===ME.uid||isAdmin();
+    return `<tr><td><b>${esc(r.aSeq||"—")}</b><div class="hint">${r.date?thDateEn(r.date):""}</div></td>
+    <td><b>${esc(r.strat||"ไม่ระบุประเด็นการพัฒนา")}</b>
+      <div class="hint">${esc(r.plan||"-")}${r.work?" › "+esc(r.work):""}</div>
+      <div style="margin-top:4px"><span class="chip t">${esc(r.dept||"-")}</span></div></td>
+    <td>${esc(r.year)}</td><td class="center">${(r.items||[]).length}</td>
+    <td class="right"><b>${fm(r.total)}</b></td>
+    <td class="center">${miniBar(r.items)}</td>
+    <td>${ownerCell(r)}</td><td class="center"><span class="badge ${s[1]}">${s[0]}</span></td>
+    <td class="center" style="white-space:nowrap">
+    <button type="button" class="btn sec sm" data-act="doc" data-id="${r.id}">เอกสาร</button>
+    ${mine?`<button type="button" class="btn gh sm" data-act="edit" data-id="${r.id}">แก้ไข</button>
+    <button type="button" class="btn dg sm" data-act="del" data-id="${r.id}">ลบ</button>`:""}</td></tr>`;
+  }).join(""):'<tr><td colspan="9"><div class="empty"><div class="e">🗂</div>ไม่พบข้อมูลตามเงื่อนไขที่เลือก</div></td></tr>';
+  t.innerHTML=h;
+}
+
+/* ============ รายงานรายเดือน ============ */
+function rptData(){
+  const yy=val("r_year"),only=val("r_only");
+  const data=RECS.filter(r=>(!yy||String(r.year||"")===yy)&&(!only||r.status===only));
+  return{yy,data,its:flatItems(data)};
+}
+function renderReport(){
+  const t=el("tbrpt");if(!t)return;
+  const{yy,data,its}=rptData();
+  el("rptScope").textContent=yy
+    ?`ปีงบประมาณ พ.ศ. ${yy} (ต.ค. ${num(yy)-1} – ก.ย. ${yy}) — ${data.length} ชุดบันทึก / ${its.length} โครงการ`
+    :"ยังไม่มีข้อมูลปีงบประมาณ";
+  const spread=monthSpread(its);
+  const cnt=new Array(12).fill(0),sum=new Array(12).fill(0);
+  its.forEach(x=>(x.ms||[]).forEach((v,i)=>{if(v){cnt[i]++;sum[i]+=num(x.budget)}}));
+  const mx=Math.max(...spread,1);
+  const totalBudget=its.reduce((s,x)=>s+num(x.budget),0);
+  let h='<thead><tr><th>เดือน</th><th>ปี พ.ศ.</th><th>จำนวนโครงการ</th><th>งบประมาณของโครงการที่ดำเนินการ</th><th>งบประมาณเฉลี่ยลงเดือน</th><th>สัดส่วน</th></tr></thead><tbody>';
+  h+=MON.map((m,i)=>`<tr><td>${MONF[i]}</td><td>${yy?(i<3?num(yy)-1:num(yy)):"—"}</td>
+    <td>${cnt[i].toLocaleString("th-TH")}</td><td>${fm(sum[i])}</td><td><b>${fm(spread[i])}</b></td>
+    <td><div class="mb"><i style="width:${Math.round(spread[i]/mx*100)}%"></i></div></td></tr>`).join("");
+  h+=`</tbody><tfoot><tr><td>รวมทั้งปีงบประมาณ</td><td></td><td>${its.length.toLocaleString("th-TH")}</td>
+    <td>${fm(totalBudget)}</td><td>${fm(spread.reduce((a,b)=>a+b,0))}</td><td></td></tr></tfoot>`;
+  t.innerHTML=h;
+
+  const f=el("tbfin");if(!f)return;
+  const fc=new Array(12).fill(0),fb=new Array(12).fill(0);
+  its.forEach(x=>{const i=parseInt(x.fmn,10);if(!isNaN(i)&&i>=0&&i<12){fc[i]++;fb[i]+=num(x.budget)}});
+  const nodate=its.filter(x=>x.fmn===""||x.fmn==null).length;
+  let g='<thead><tr><th>เดือนที่แล้วเสร็จ</th><th>จำนวนโครงการ</th><th>งบประมาณ (บาท)</th></tr></thead><tbody>';
+  g+=MONF.map((m,i)=>`<tr><td>${m}</td><td>${fc[i].toLocaleString("th-TH")}</td><td>${fm(fb[i])}</td></tr>`).join("");
+  g+=`<tr><td style="color:var(--mute)">ยังไม่ระบุเดือนแล้วเสร็จ</td><td>${nodate}</td><td>—</td></tr>`;
+  g+=`</tbody><tfoot><tr><td>รวม</td><td>${fc.reduce((a,b)=>a+b,0).toLocaleString("th-TH")}</td><td>${fm(fb.reduce((a,b)=>a+b,0))}</td></tr></tfoot>`;
+  f.innerHTML=g;
+}
+
+/* ============ อนุมัติ / ผู้ใช้ / ตั้งค่า ============ */
+function renderAdmin(){
+  const t=el("tbadmin");if(!t||!isAdmin())return;
+  let h='<tr><th>ประเด็นการพัฒนา / ผู้บันทึก</th><th class="right">งบประมาณ</th><th style="width:100px">ลำดับบัญชี</th><th style="width:150px">วันที่ประกาศใช้</th><th style="width:150px">สถานะ</th><th>หมายเหตุ</th><th class="center">จัดการ</th></tr>';
+  h+=RECS.length?RECS.map(r=>`<tr>
+    <td><b>${esc(r.strat||"-")}</b><div class="hint">${esc(r.plan||"")} · ปีงบ ${esc(r.year)} · ${(r.items||[]).length} โครงการ</div>
+    <div style="margin-top:6px">${ownerCell(r)}</div></td>
+    <td class="right"><b>${fm(r.total)}</b></td>
+    <td><input id="a1${r.id}" value="${esc(r.aSeq||"")}" placeholder="1"></td>
+    <td><input type="date" id="a2${r.id}" value="${esc(r.aDate||"")}"></td>
+    <td><select id="a3${r.id}">${Object.keys(STL).map(k=>`<option value="${k}"${r.status===k?" selected":""}>${STL[k][0]}</option>`).join("")}</select></td>
+    <td><input id="a4${r.id}" value="${esc(r.remark||"")}" placeholder="กรณีไม่อนุมัติ ระบุเหตุผล"></td>
+    <td class="center" style="white-space:nowrap"><button type="button" class="btn ok sm" data-act="admin-save" data-id="${r.id}">✔ บันทึก</button>
+    <button type="button" class="btn sec sm" data-act="doc" data-id="${r.id}">เอกสาร</button></td></tr>`).join("")
+    :'<tr><td colspan="7"><div class="empty"><div class="e">🗂</div>ยังไม่มีข้อมูล</div></td></tr>';
+  t.innerHTML=h;
+}
+async function saveAdmin(id){
+  if(!isAdmin()){alert("เฉพาะผู้ดูแลระบบเท่านั้น");return}
+  const r=RECS.find(x=>x.id===id);if(!r)return;
+  const n={...r,aSeq:val("a1"+id),aDate:val("a2"+id),status:val("a3"+id),remark:val("a4"+id)};
+  n.approvedBy=ME.name;n.approvedAt=new Date().toISOString();
+  try{await dbSaveRec(n);alert("บันทึกสถานะเรียบร้อย")}catch(e){alert("บันทึกไม่สำเร็จ: "+e.message)}
+}
+function renderUsers(){
+  const t=el("tbusers");if(!t||!isAdmin())return;
+  let h='<tr><th class="center" style="width:40px">#</th><th>ชื่อ-นามสกุล</th><th>อีเมล</th><th>ส่วนราชการ</th><th style="width:170px">สิทธิ์</th><th class="center">จัดการ</th></tr>';
+  h+=USERS.length?USERS.map((u,i)=>{const c=avColor(u.uid||u.email),adm=u.role==="admin";
+    return `<tr><td class="center" style="color:var(--mute);font-weight:600">${i+1}</td>
+    <td><div class="owner"><span class="av" style="background:${c}">${avChar(u.name)}</span>
+    <div><b>${esc(u.name||"-")}</b>${adm?' <span class="chip">ADMIN</span>':''}</div></div></td>
+    <td>${esc(u.email||"")}</td><td>${esc(u.dept||"—")}</td>
+    <td><select id="r_${u.uid}"><option value="user"${!adm?" selected":""}>เจ้าหน้าที่</option><option value="admin"${adm?" selected":""}>ผู้ดูแลระบบ</option></select></td>
+    <td class="center"><button type="button" class="btn ok sm" data-act="role-save" data-id="${u.uid}">✔ บันทึก</button></td></tr>`;
+  }).join(""):'<tr><td colspan="6"><div class="empty"><div class="e">👤</div>ยังไม่มีผู้ใช้</div></td></tr>';
+  t.innerHTML=h;
+}
+async function saveRole(uid){
+  if(!isAdmin())return;
+  if(uid===ME.uid&&val("r_"+uid)!=="admin"&&!confirm("คุณกำลังลดสิทธิ์ตนเอง ยืนยันหรือไม่?"))return;
+  try{await dbSetRole(uid,val("r_"+uid));alert("บันทึกสิทธิ์เรียบร้อย")}catch(e){alert("บันทึกไม่สำเร็จ: "+e.message)}
+}
+function applySettingUI(){
+  ["p1n","p1t","pdn","pdt","p2n","p2t","p3n","p3t","p4n","p4t","depts","strats"].forEach(k=>setVal("s_"+k,SETTING[k]));
+  el("logoPrev").src=SETTING.logo||LOGO_DEFAULT;
+}
+async function saveSetting(){
+  if(!isAdmin()){alert("เฉพาะผู้ดูแลระบบเท่านั้น");return}
+  const s={...SETTING};["p1n","p1t","pdn","pdt","p2n","p2t","p3n","p3t","p4n","p4t"].forEach(k=>s[k]=val("s_"+k));
+  try{await dbSaveSetting(s);SETTING=s;alert("บันทึกการตั้งค่าเรียบร้อย")}catch(e){alert("บันทึกไม่สำเร็จ: "+e.message)}
+}
+async function saveLists(){
+  if(!isAdmin()){alert("เฉพาะผู้ดูแลระบบเท่านั้น");return}
+  const s={...SETTING,depts:val("s_depts"),strats:val("s_strats")};
+  try{await dbSaveSetting(s);SETTING=s;fillHeadSelects();alert("บันทึกรายการเรียบร้อย")}catch(e){alert("บันทึกไม่สำเร็จ: "+e.message)}
+}
+function onLogo(f){
+  if(f.size>350*1024){alert("ไฟล์ใหญ่เกิน 350 KB");return}
+  const rd=new FileReader();
+  rd.onload=async()=>{const s={...SETTING,logo:rd.result};
+    try{await dbSaveSetting(s);SETTING=s;el("logoPrev").src=rd.result;alert("อัปโหลดเรียบร้อย")}
+    catch(e){alert("อัปโหลดไม่สำเร็จ: "+e.message)}};
+  rd.readAsDataURL(f);
+}
+
+/* ============ เอกสาร ผด.๐๒ ============ */
+const PH=t=>`<span class="ph">✎ [${t}]</span>`;
+const fill=(v,ph)=>v&&String(v).trim()?esc(v):PH(ph);
+function monthCells(ms){
+  ms=ms||[];let out="",i=0;
+  while(i<12){
+    if(ms[i]){let j=i;while(j+1<12&&ms[j+1])j++;
+      out+=`<td colspan="${j-i+1}" class="mc"><table class="arw"><tr><td>◄</td><td class="m"></td><td>►</td></tr></table></td>`;i=j+1}
+    else{out+='<td class="mc"></td>';i++}
+  }
+  return out;
+}
+function planHead(year){
+  return `<tr>
+    <th rowspan="3" style="width:3.2%">ที่</th>
+    <th rowspan="3" style="width:13%">โครงการ/กิจกรรม</th>
+    <th rowspan="3" style="width:16%">รายละเอียดของกิจกรรม<br>ที่เกิดขึ้นจากโครงการ</th>
+    <th rowspan="3" style="width:7.5%">งบประมาณ<br>(บาท)</th>
+    <th rowspan="3" style="width:8.5%">สถานที่<br>ดำเนินการ</th>
+    <th rowspan="3" style="width:7.5%">หน่วยงาน<br>รับผิดชอบหลัก</th>
+    <th colspan="12">ประจำปีงบประมาณ พ.ศ. ${toThaiNum(year||"")}</th>
+    <th rowspan="3" style="width:8%">ดำเนินการ<br>แล้วเสร็จ</th></tr>
+  <tr><th colspan="3">พ.ศ. ${toThaiNum(num(year)-1||"")}</th><th colspan="9">พ.ศ. ${toThaiNum(year||"")}</th></tr>
+  <tr>${MON.map(m=>`<th style="width:3%;height:1.5cm"><span class="vt">${m}</span></th>`).join("")}</tr>`;
+}
+function planRow(x,i,year){
+  const fin=(x.fmn!==""&&x.fmn!=null)?`${MONF[parseInt(x.fmn,10)]}<br>พ.ศ. ${toThaiNum(x.fyr||year||"")}`:"";
+  return `<tr><td class="c">${toThaiNum(i)}.</td>
+    <td>${fill(x.name,"ระบุชื่อโครงการ")}</td>
+    <td style="text-align:justify">${x.detail?esc(x.detail):PH("ระบุรายละเอียดกิจกรรม")}</td>
+    <td class="c">${toThaiNum(fmi(x.budget))}</td>
+    <td class="c">${x.loc?esc(x.loc):"-"}</td>
+    <td class="c">${x.dept?esc(x.dept):"-"}</td>
+    ${monthCells(x.ms)}
+    <td class="c">${fin||"-"}</td></tr>`;
+}
+function sheetWrap(year,inner){
+  return `<div class="sheet ls">
+    <div class="dform">แบบ ผด. ๐๒</div>
+    <div class="dhead"><div class="f">บัญชีโครงการพัฒนา</div>
+      <div class="f">แผนการดำเนินงาน ประจำปีงบประมาณ พ.ศ. ${toThaiNum(year||"")}</div>
+      <div class="f">เทศบาลเมืองดอนแก้ว  อำเภอแม่ริม  จังหวัดเชียงใหม่</div>
+      <div class="dstars">****************************</div></div>
+    ${inner}</div>`;
+}
+function buildPlanDocHTML(year,recs){
+  const groups={};
+  recs.forEach(r=>{
+    const k=(r.strat||"ไม่ระบุประเด็นการพัฒนา")+"||"+(r.plan||"ไม่ระบุแผนงาน")+"||"+(r.work||"");
+    (groups[k]=groups[k]||{strat:r.strat,plan:r.plan,work:r.work,items:[]}).items.push(...(r.items||[]));
+  });
+  const keys=Object.keys(groups);
+  if(!keys.length)return sheetWrap(year,'<p style="text-align:center;margin-top:3cm">— ไม่มีข้อมูลโครงการในปีงบประมาณที่เลือก —</p>');
+  let out="",gi=0,running=0;
+  keys.forEach(k=>{
+    const g=groups[k];gi++;
+    const CH=5;
+    for(let p=0;p<Math.ceil(g.items.length/CH);p++){
+      const slice=g.items.slice(p*CH,p*CH+CH);
+      const head=p===0
+        ?`<div class="dgroup">${toThaiNum(gi)}. ภายใต้${esc(g.strat||"ไม่ระบุประเด็นการพัฒนา")}</div>
+          <div class="dgroup2">${toThaiNum(gi)}.๑ ${esc(g.plan||"ไม่ระบุแผนงาน")}${g.work?" : "+esc(g.work):""}</div>`
+        :`<div class="dgroup2">${esc(g.plan||"")} (ต่อ)</div>`;
+      const rows=slice.map((x,i)=>planRow(x,p*CH+i+1,year)).join("");
+      const sub=(p===Math.ceil(g.items.length/CH)-1)
+        ?`<div class="dsum">รวม ${toThaiNum(g.items.length)} โครงการ  งบประมาณ ${toThaiNum(fmi(g.items.reduce((s,x)=>s+num(x.budget),0)))} บาท</div>`:"";
+      out+=sheetWrap(year,head+`<table class="doc">${planHead(year)}${rows}</table>`+sub
+        +`<div class="dfoot">หน้า ${toThaiNum(++running)}</div>`);
+    }
+  });
+  const all=keys.reduce((a,k)=>a.concat(groups[k].items),[]);
+  const s=SETTING;
+  out+=sheetWrap(year,`<div style="margin-top:1cm"></div>
+    <table class="doc"><tr><th style="width:55%">สรุปภาพรวมแผนการดำเนินงาน</th><th>จำนวน</th></tr>
+    <tr><td>จำนวนประเด็นการพัฒนา/แผนงานที่ปรากฏในแผน</td><td class="c">${toThaiNum(keys.length)} กลุ่ม</td></tr>
+    <tr><td>จำนวนโครงการ/กิจกรรมทั้งสิ้น</td><td class="c">${toThaiNum(all.length)} โครงการ</td></tr>
+    <tr><td>งบประมาณรวมทั้งสิ้น</td><td class="c">${toThaiNum(fmi(all.reduce((a,x)=>a+num(x.budget),0)))} บาท</td></tr></table>
+    <div class="sig">(ลงชื่อ) ..............................................<br>( ${esc(s.p2n)} )<br>${esc(s.p2t)}</div><div class="clr"></div>
+    <div class="sig">(ลงชื่อ) ..............................................<br>( ${esc(s.p3n)} )<br>${esc(s.p3t)}</div><div class="clr"></div>
+    <div class="sig">(ลงชื่อ) ..............................................<br>( ${esc(s.p4n)} )<br>${esc(s.p4t)}</div><div class="clr"></div>`);
+  return out;
+}
+function buildMonthDocHTML(year,its){
+  const spread=monthSpread(its),cnt=new Array(12).fill(0),sum=new Array(12).fill(0);
+  its.forEach(x=>(x.ms||[]).forEach((v,i)=>{if(v){cnt[i]++;sum[i]+=num(x.budget)}}));
+  const s=SETTING;
+  const rows=MON.map((m,i)=>`<tr><td class="c">${toThaiNum(i+1)}</td><td>${MONF[i]} ${toThaiNum((i<3?num(year)-1:num(year))||"")}</td>
+    <td class="c">${toThaiNum(cnt[i])}</td><td class="r">${toThaiNum(fmi(sum[i]))}</td><td class="r">${toThaiNum(fmi(spread[i]))}</td></tr>`).join("");
+  return `<div class="sheet pt">
+    <div class="dhead"><div class="f">รายงานสรุปแผนการดำเนินงานรายเดือน</div>
+    <div class="f">ประจำปีงบประมาณ พ.ศ. ${toThaiNum(year||"")}</div>
+    <div class="f">เทศบาลเมืองดอนแก้ว  อำเภอแม่ริม  จังหวัดเชียงใหม่</div>
+    <div class="dstars">****************************</div></div>
+    <table class="doc"><tr><th style="width:8%">ที่</th><th>เดือน</th><th style="width:18%">จำนวนโครงการ</th>
+    <th style="width:22%">งบประมาณของโครงการ<br>ที่ดำเนินการ (บาท)</th><th style="width:22%">งบประมาณเฉลี่ย<br>ลงเดือน (บาท)</th></tr>
+    ${rows}
+    <tr><td colspan="2" class="c"><b>รวมทั้งปีงบประมาณ</b></td><td class="c"><b>${toThaiNum(its.length)}</b></td>
+    <td class="r"><b>${toThaiNum(fmi(its.reduce((a,x)=>a+num(x.budget),0)))}</b></td>
+    <td class="r"><b>${toThaiNum(fmi(spread.reduce((a,b)=>a+b,0)))}</b></td></tr></table>
+    <p style="margin-top:10px;font-size:14pt">หมายเหตุ : งบประมาณเฉลี่ยลงเดือน คำนวณจากงบประมาณของโครงการหารด้วยจำนวนเดือนที่ดำเนินการตามแผน</p>
+    <div class="sig">(ลงชื่อ) ..............................................<br>( ${esc(s.p1n)} )<br>${esc(s.p1t)}</div><div class="clr"></div>
+    <div class="sig">(ลงชื่อ) ..............................................<br>( ${esc(s.p2n)} )<br>${esc(s.p2t)}</div><div class="clr"></div>
+    </div>`;
+}
+function previewNow(){
+  const r=readForm();
+  if(!r.items.length){alert("กรุณาเพิ่มโครงการก่อน");return}
+  buildDoc({kind:"plan",year:r.year,html:buildPlanDocHTML(r.year,[r]),
+    title:"ผด02-"+(r.strat||"แผนการดำเนินงาน")+"-"+r.year,note:"ตัวอย่างเฉพาะชุดที่กำลังกรอก"});
+}
+function showDoc(id){const r=RECS.find(x=>x.id===id);if(!r)return;
+  buildDoc({kind:"plan",year:r.year,html:buildPlanDocHTML(r.year,[r]),
+    title:"ผด02-"+(r.plan||"แผนการดำเนินงาน")+"-"+r.year,note:"ชุดบันทึกเดียว · "+(r.ownerName||"")})}
+function showDocAll(){
+  const yy=val("q_year");
+  if(!yy){alert("กรุณาเลือกปีงบประมาณในหน้าทะเบียนก่อน");return}
+  const l=filtered();
+  buildDoc({kind:"plan",year:yy,html:buildPlanDocHTML(yy,l),
+    title:"ผด02-แผนการดำเนินงาน-"+yy,note:"รวม "+l.length+" ชุดบันทึก ปีงบประมาณ "+yy});
+}
+function showDocMonth(){
+  const{yy,its}=rptData();
+  if(!yy){alert("ยังไม่มีข้อมูลปีงบประมาณ");return}
+  buildDoc({kind:"month",year:yy,html:buildMonthDocHTML(yy,its),
+    title:"รายงานสรุปรายเดือน-"+yy,note:"สรุปรายเดือน ปีงบประมาณ "+yy});
+}
+function closeDoc(){document.body.classList.remove("present");el("docWrap").style.display="none";qa(".tabpane").forEach(p=>p.style.display="")}
+function buildDoc(d){
+  curDoc=d;el("doc").innerHTML=d.html;
+  el("docNote").textContent=d.note||"";
+  el("btnWord").style.display=isAdmin()?"":"none";
+  qa(".tabpane").forEach(p=>p.style.display="none");
+  el("docWrap").style.display="block";window.scrollTo(0,0);
+}
+function togglePresent(){
+  document.body.classList.toggle("present");
+  const b=q('[data-act="present"]');
+  if(b)b.textContent=document.body.classList.contains("present")?"⤢ ออกจากโหมดนำเสนอ":"🖥 โหมดนำเสนอ";
+}
+function dl(name,blob){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},900)}
+
+/* ============ EXPORT WORD ============ */
+function exportWord(){
+  if(!isAdmin()){alert("เฉพาะผู้ดูแลระบบเท่านั้นที่ดึงข้อมูลออกเป็นไฟล์ Word ได้");return}
+  if(!curDoc){alert("กรุณาเปิดเอกสารก่อน");return}
+  const ls=curDoc.kind==="plan";
+  const css=
+   (ls?"@page Section1{size:29.7cm 21cm;mso-page-orientation:landscape;margin:1cm 1.2cm;}"
+      :"@page Section1{size:21cm 29.7cm;mso-page-orientation:portrait;margin:1.5cm 2cm;}")
+  +"div.Section1{page:Section1;}"
+  +"body,p,td,th,div,span{font-family:'TH SarabunIT๙','TH SarabunIT9','TH SarabunPSK',sans-serif;}"
+  +"body{line-height:1.15;color:#000;margin:0;font-size:"+(ls?"13.5pt":"16pt")+"}"
+  +".dform{text-align:right;font-weight:bold;font-size:16pt;margin-bottom:0}"
+  +".dhead{text-align:center;font-weight:bold}"
+  +".dhead .f{font-size:18pt;font-weight:bold}"
+  +".dstars{letter-spacing:2pt}"
+  +".dgroup{font-weight:bold;font-size:15pt;margin:8pt 0 2pt}"
+  +".dgroup2{font-weight:bold;font-size:15pt;margin:2pt 0 3pt;margin-left:1cm}"
+  +"table.doc{width:100%;border-collapse:collapse;font-size:13.5pt;margin-top:4pt;table-layout:fixed}"
+  +"table.doc th,table.doc td{border:1pt solid #000;padding:2pt 3pt;vertical-align:top;font-size:13.5pt;word-wrap:break-word}"
+  +"table.doc th{text-align:center;font-weight:bold;vertical-align:middle}"
+  +"table.doc td.c{text-align:center}table.doc td.r{text-align:right}"
+  +"table.doc td.mc{vertical-align:middle;padding:3pt 0}"
+  +".vt{mso-rotate:-90;font-size:12pt;layout-flow:vertical-ideographic}"
+  +"table.arw{width:100%;border-collapse:collapse}"
+  +"table.arw td{border:none;padding:0;font-size:10pt;text-align:center;line-height:1}"
+  +"table.arw td.m{border:none;border-top:1pt solid #000;width:99%}"
+  +".dsum{margin-top:5pt;font-weight:bold;font-size:15pt;text-align:right}"
+  +".dfoot{margin-top:6pt;font-size:13pt;text-align:right;color:#333}"
+  +".ph{border:1pt dashed #F0A030;color:#B8792B;padding:0 4pt}"
+  +".sig{margin-top:22pt;text-align:center;width:45%;float:right;line-height:1.2;font-size:16pt}"
+  +".clr{clear:both}";
+  let body=curDoc.html
+    .replace(/<div class="sheet[^"]*">/g,'<div style="page-break-after:always">')
+    .replace(/<span class="vt">/g,'<span class="vt">');
+  const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
+   +'<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>'+esc(curDoc.title||"แผนการดำเนินงาน")+'</title>'
+   +'<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->'
+   +'<style>'+css+'</style></head><body><div class="Section1">'+body+'</div></body></html>';
+  dl((curDoc.title||"เอกสาร")+".doc",new Blob(["\ufeff"+html],{type:"application/msword;charset=utf-8"}));
+}
+function exportCSV(){
+  const l=filtered();
+  const rows=[["ลำดับบัญชี","ปีงบ","สถานะ","ประเด็นการพัฒนาท้องถิ่น","แผนงาน","งาน","ผู้บันทึก","ผู้จัดทำ","ตำแหน่ง","ลำดับโครงการ","โครงการ/กิจกรรม","รายละเอียด","งบประมาณ","สถานที่","หน่วยงานรับผิดชอบ",...MON,"จำนวนเดือน","เฉลี่ยต่อเดือน","แล้วเสร็จเดือน","ปี พ.ศ."]];
+  l.forEach(r=>(r.items||[]).forEach((x,i)=>{
+    const n=(x.ms||[]).filter(Boolean).length;
+    rows.push([r.aSeq||"",r.year,STLget(r.status)[0],r.strat,r.plan,r.work,r.ownerName||"",r.p1n||"",r.p1t||"",
+      i+1,x.name,x.detail,x.budget,x.loc,x.dept,
+      ...(x.ms||[]).map(v=>v?"X":""),n,n?(num(x.budget)/n).toFixed(2):"",
+      (x.fmn!==""&&x.fmn!=null)?MONF[parseInt(x.fmn,10)]:"",x.fyr||""]);
+  }));
+  const yy=val("q_year");
+  dl("แผนการดำเนินงาน-ผด02"+(yy?"-ปี"+yy:"")+".csv",
+     new Blob(["\uFEFF"+rows.map(r=>r.map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(",")).join("\n")],{type:"text/csv;charset=utf-8"}));
+}
+function backup(){dl("backup-แผนการดำเนินงาน-"+new Date().toISOString().slice(0,10)+".json",
+  new Blob([JSON.stringify({data:RECS,setting:SETTING},null,1)],{type:"application/json"}))}
+
+/* ============ EVENTS ============ */
+function gotoTab(name){
+  qa("nav button").forEach(x=>x.classList.toggle("on",x.getAttribute("data-tab")===name));
+  qa(".tabpane").forEach(p=>{p.classList.toggle("on",p.id==="tab-"+name);p.style.display=""});
+  closeDoc();
+  if(name==="dash")renderDash();if(name==="list")renderList();if(name==="report")renderReport();
+}
+document.addEventListener("click",e=>{
+  try{
+    const gt=up(e.target,"[data-gt]");if(gt){setGateMode(gt.getAttribute("data-gt"));return}
+    if(up(e.target,"#gBtn")){doAuth();return}
+    const nb=up(e.target,"nav button[data-tab]");if(nb){gotoTab(nb.getAttribute("data-tab"));return}
+    const b=up(e.target,"[data-act]");if(!b)return;
+    const act=b.getAttribute("data-act"),id=b.getAttribute("data-id");
+    if(act.indexOf("q-")===0){e.preventDefault();quickMonth(up(b,".item"),act.slice(2));return}
+    e.preventDefault();
+    if(act==="add")addItem();
+    else if(act==="del-item"){const it=up(b,".item");if(it){it.remove();renum();calc()}}
+    else if(act==="save-draft")saveRec("draft");
+    else if(act==="save-wait")saveRec("wait");
+    else if(act==="preview")previewNow();
+    else if(act==="reset")resetForm();
+    else if(act==="csv")exportCSV();
+    else if(act==="backup")backup();
+    else if(act==="admin-save")saveAdmin(id);
+    else if(act==="role-save")saveRole(id);
+    else if(act==="save-setting")saveSetting();
+    else if(act==="save-lists")saveLists();
+    else if(act==="logo-reset"){dbSaveSetting({...SETTING,logo:""}).then(()=>{SETTING={...SETTING,logo:""};el("logoPrev").src=LOGO_DEFAULT})}
+    else if(act==="doc")showDoc(id);
+    else if(act==="doc-all")showDocAll();
+    else if(act==="doc-month")showDocMonth();
+    else if(act==="edit")editRec(id);
+    else if(act==="del")delRec(id);
+    else if(act==="print")window.print();
+    else if(act==="word")exportWord();
+    else if(act==="present")togglePresent();
+    else if(act==="closedoc")closeDoc();
+    else if(act==="logout")logout();
+  }catch(err){showErr("click: "+err.message)}
+},false);
+document.addEventListener("change",e=>{
+  try{
+    const t=e.target,f=t.getAttribute&&t.getAttribute("data-f");
+    if(f&&up(t,".item"))calc();
+    if(t.id==="f_plan"||t.id==="f_strat")syncHeadWork();
+    if(t.id==="f_work")el("f_workX").style.display=(t.value===OTHER)?"block":"none";
+    if(t.id==="d_year")renderDash();
+    if(t.id==="q_st"||t.id==="q_year")renderList();
+    if(t.id==="r_year"||t.id==="r_only")renderReport();
+    if(t.id==="f_year")refreshYearPickers();
+    if(t.id==="logoFile"&&t.files&&t.files[0]){onLogo(t.files[0]);t.value=""}
+  }catch(err){showErr("change: "+err.message)}
+},false);
+document.addEventListener("input",e=>{
+  const t=e.target,f=t.getAttribute&&t.getAttribute("data-f");
+  if(f&&up(t,".item")&&/(budget|name)$/.test(f))calc();
+  if(t.id==="q_kw")renderList();
+},false);
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&(e.target.id==="g_pw"||e.target.id==="g_email")){e.preventDefault();doAuth()}
+  if(e.key==="Escape"&&document.body.classList.contains("present"))togglePresent();
+},false);
+
+const d0=el("f_date");if(d0&&!d0.value)d0.value=new Date().toISOString().slice(0,10);
+applySettingUI();fillHeadSelects();refreshYearPickers();
+el("logoPrev").src=SETTING.logo||LOGO_DEFAULT;
+if(!USE_CLOUD)setGateMode("in");
+</script>
+</body>
+</html>
